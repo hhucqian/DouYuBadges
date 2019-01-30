@@ -4,7 +4,7 @@ class DouyuMsgItem:
     def __init__(self, msg:bytes):
         self.kv_dict = {}
         try:
-            msg_content = msg[12:].decode("utf-8").split('/')
+            msg_content = msg[12:].decode("utf-8", 'ignore').split('/')
             for item in msg_content:
                 kv = item.split("@=")
                 if len(kv) > 1:
