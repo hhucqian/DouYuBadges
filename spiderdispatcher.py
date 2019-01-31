@@ -71,4 +71,4 @@ class SpiderDispatcher:
                         t = threading.Thread(target=dy_room.start_job)
                         t.setDaemon(True)
                         t.start()
-                    self.job_list.append(dy_room)
+                        self.job_list.append(dy_room)
