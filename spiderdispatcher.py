@@ -13,6 +13,7 @@ class SpiderDispatcher:
     def __init__(self):
         self.job_list = []
         self.badge_server = BadgeServer()
+        self.room_id_filter = {}
 
     def load_room_id_list(self):
         with urllib.request.urlopen('http://open.douyucdn.cn/api/RoomApi/live?limit=100') as f:
@@ -30,6 +31,7 @@ class SpiderDispatcher:
         while True:
             time.sleep(10)
             print('database record count:', self.badge_server.get_record_count())
+            print('current room count:', len(self.job_list))
 
     def start(self):
         t = threading.Thread(target=self.print_record_count)
@@ -55,12 +57,18 @@ class SpiderDispatcher:
                 job.room_id for job in self.job_list if job.record_stamp > stamp_level]
             for job in jobs_to_stop:
                 job.stop_job()
+                self.room_id_filter[job.room_id] = 5
             self.job_list = jobs_to_continue
             room_id_list = self.load_room_id_list()
             for room_id in room_id_list:
                 if room_id not in running_room_id_list:
-                    dy_room = DouyuRoom(room_id, self.badge_server)
-                    t = threading.Thread(target=dy_room.start_job)
-                    t.setDaemon(True)
-                    t.start()
+                    if room_id in self.room_id_filter.keys():
+                        self.room_id_filter[room_id] -= 1
+                        if self.room_id_filter[room_id] == 0:
+                            self.room_id_filter.pop(room_id)
+                    else:
+                        dy_room = DouyuRoom(room_id, self.badge_server)
+                        t = threading.Thread(target=dy_room.start_job)
+                        t.setDaemon(True)
+                        t.start()
                     self.job_list.append(dy_room)

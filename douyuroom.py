@@ -90,7 +90,6 @@ class DouyuRoom:
         t2.setDaemon(True)
         t2.start()
         self.t1.join()
-        print(self, "stop")
 
     def stop_job(self):
         self.stop = True
