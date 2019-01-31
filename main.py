@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-from douyuroom import DouyuRoom
+from spiderdispatcher import SpiderDispatcher
 
 
 def main():
-    room = DouyuRoom(99999)
-    print(room)
-    room.start_job()
+    s = SpiderDispatcher()
+    s.start()
+
 
 if __name__ == '__main__':
     main()
