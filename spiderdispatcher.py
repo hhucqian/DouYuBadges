@@ -48,7 +48,7 @@ class SpiderDispatcher:
 
         while True:
             time.sleep(5 * 60)
-            stamp_level = 2
+            stamp_level = 1
             jobs_to_stop = [
                 job for job in self.job_list if job.record_stamp <= stamp_level]
             jobs_to_continue = [
