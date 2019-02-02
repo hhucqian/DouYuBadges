@@ -59,7 +59,7 @@ class DouyuRoom:
 
     def process_msg(self, msg: bytes):
         msg_item = DouyuMsgItem(msg)
-        if msg_item.is_chat_msg():
+        if msg_item.is_chat_msg() or msg_item.is_dgb_msg():
             if len(msg_item.bnn) > 0:
                 if self.badge_server.add_badge(msg_item.bnn, msg_item.brid):
                     self.record_stamp += 1

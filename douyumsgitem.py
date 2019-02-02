@@ -16,6 +16,9 @@ class DouyuMsgItem:
     def is_chat_msg(self):
         return self.type == "chatmsg"
 
+    def is_dgb_msg(self):
+        return self.type == "dgb"
+
     def __getattr__(self, name):
         if name in self.kv_dict:
             return self.kv_dict[name]
