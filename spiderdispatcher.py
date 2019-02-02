@@ -57,9 +57,15 @@ class SpiderDispatcher:
                 job.room_id for job in self.job_list if job.record_stamp > stamp_level]
             for job in jobs_to_stop:
                 job.stop_job()
-                self.room_id_filter[job.room_id] = 5
+                self.room_id_filter[job.room_id] = 10
             self.job_list = jobs_to_continue
             room_id_list = self.load_room_id_list()
+
+            for room_id in self.room_id_filter.keys():
+                self.room_id_filter[room_id] -= 1
+                if self.room_id_filter[room_id] == 0:
+                    self.room_id_filter.pop(room_id)
+
             for room_id in room_id_list:
                 if room_id not in running_room_id_list:
                     if room_id in self.room_id_filter.keys():

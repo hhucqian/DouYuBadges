@@ -14,7 +14,7 @@ class DouyuRoom:
         self.room_id = room_id
         self.send_lock = threading.Lock()
         self.badge_server = badge_server
-        self.stop = False
+        self.is_stop = False
         self.record_stamp = 0
         self.t1 = None
 
@@ -26,6 +26,8 @@ class DouyuRoom:
         self.s.settimeout(1)
 
     def send_msg(self, msg):
+        if self.is_stop:
+            return
         data_length = len(msg) + 8
         code = 689
         msgHead = struct.pack('<i', data_length) \
@@ -52,6 +54,8 @@ class DouyuRoom:
 
     def send_tick(self):
         while True:
+            if self.is_stop:
+                break
             msg = 'type@=mrkl/\0'
             msg = msg.encode('utf-8')
             self.send_msg(msg)
@@ -68,16 +72,22 @@ class DouyuRoom:
         content = bytes()
         while True:
             try:
-                if self.stop:
-                    break
                 content += self.s.recv(1024)
                 index = content.find(b'\0', 12)
                 if index > 0:
                     self.process_msg(content[0:index])
                     content = content[index + 1:]
             except socket.timeout:
-                if self.stop:
+                continue
+            except:
+                self.s.close()
+                self.connect()
+                self.login()
+                self.join_group()
+            finally:
+                if self.is_stop:
                     break
+        self.s.close()
 
     def start_job(self):
         self.connect()
@@ -92,7 +102,7 @@ class DouyuRoom:
         self.t1.join()
 
     def stop_job(self):
-        self.stop = True
+        self.is_stop = True
         self.t1.join()
 
     def __str__(self):
