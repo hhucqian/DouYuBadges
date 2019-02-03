@@ -84,6 +84,7 @@ class DouyuRoom:
                 self.connect()
                 self.login()
                 self.join_group()
+                content = bytes()
             finally:
                 if self.is_stop:
                     break
