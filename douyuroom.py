@@ -35,11 +35,14 @@ class DouyuRoom:
             + struct.pack('<h', code) \
             + struct.pack('c', b'\0') + struct.pack('c', b'\0')
         with self.send_lock:
-            self.s.send(msgHead)
-            sent = 0
-            while sent < len(msg):
-                tn = self.s.send(msg[sent:])
-                sent = sent + tn
+            try:
+                self.s.send(msgHead)
+                sent = 0
+                while sent < len(msg):
+                    tn = self.s.send(msg[sent:])
+                    sent = sent + tn
+            except:
+                return
 
     def login(self):
         login = 'type@=loginreq/roomid@={0}/\0'.format(self.room_id)
