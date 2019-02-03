@@ -77,9 +77,10 @@ class DouyuRoom:
             try:
                 content += self.s.recv(1024)
                 index = content.find(b'\0', 12)
-                if index > 0:
+                while index > 0:
                     self.process_msg(content[0:index])
                     content = content[index + 1:]
+                    index = content.find(b'\0', 12)
             except socket.timeout:
                 continue
             except:
