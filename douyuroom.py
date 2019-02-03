@@ -94,20 +94,19 @@ class DouyuRoom:
         self.s.close()
 
     def start_job(self):
-        self.connect()
-        self.login()
-        self.join_group()
-        self.t1 = threading.Thread(target=self.recv_loop)
-        self.t1.setDaemon(True)
-        self.t1.start()
-        t2 = threading.Thread(target=self.send_tick)
-        t2.setDaemon(True)
-        t2.start()
-        self.t1.join()
+        try:
+            self.connect()
+            self.login()
+            self.join_group()
+            t1 = threading.Thread(target=self.send_tick)
+            t1.setDaemon(True)
+            t1.start()
+            self.recv_loop()
+        except:
+            self.stop_job()
 
     def stop_job(self):
         self.is_stop = True
-        self.t1.join()
 
     def __str__(self):
         return "DanmuRoom[id={0}]".format(self.room_id)

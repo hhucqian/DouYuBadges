@@ -50,7 +50,7 @@ class SpiderDispatcher:
             time.sleep(5 * 60)
             stamp_level = 1
             jobs_to_stop = [
-                job for job in self.job_list if job.record_stamp <= stamp_level]
+                job for job in self.job_list if job.record_stamp <= stamp_level or job.is_stop]
             jobs_to_continue = [
                 job for job in self.job_list if job.record_stamp > stamp_level]
             running_room_id_list = [
