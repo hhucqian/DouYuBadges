@@ -10,8 +10,9 @@ from badgeserver import BadgeServer
 
 
 class DouyuRoom:
-    def __init__(self, room_id, badge_server):
+    def __init__(self, room_id, nickname, badge_server):
         self.room_id = room_id
+        self.nickname = nickname
         self.send_lock = threading.Lock()
         self.badge_server = badge_server
         self.is_stop = False

@@ -24,7 +24,7 @@ class SpiderDispatcher:
             else:
                 res = []
                 for item in content['data']:
-                    res.append(item['room_id'])
+                    res.append((item['room_id'], item['nickname']))
                 return res
 
     def print_record_count(self):
@@ -32,6 +32,7 @@ class SpiderDispatcher:
             time.sleep(10)
             print('database record count:', self.badge_server.get_record_count())
             print('current room count:', len(self.job_list))
+            print('room list:', ' '.join([job.nickname for job in self.job_list]))
 
     def start(self):
         t = threading.Thread(target=self.print_record_count)
@@ -40,7 +41,7 @@ class SpiderDispatcher:
         room_id_list = self.load_room_id_list()
         if room_id_list is not None:
             for room_id in room_id_list:
-                dy_room = DouyuRoom(room_id, self.badge_server)
+                dy_room = DouyuRoom(room_id[0], room_id[1], self.badge_server)
                 t = threading.Thread(target=dy_room.start_job)
                 t.setDaemon(True)
                 t.start()
@@ -68,11 +69,12 @@ class SpiderDispatcher:
 
             room_id_list = self.load_room_id_list()
             for room_id in room_id_list:
-                if room_id not in running_room_id_list:
-                    if room_id in self.room_id_filter.keys():
-                        self.room_id_filter[room_id] -= 1
+                if room_id[0] not in running_room_id_list:
+                    if room_id[0] in self.room_id_filter.keys():
+                        self.room_id_filter[room_id[0]] -= 1
                     else:
-                        dy_room = DouyuRoom(room_id, self.badge_server)
+                        dy_room = DouyuRoom(
+                            room_id[0], room_id[1], self.badge_server)
                         t = threading.Thread(target=dy_room.start_job)
                         t.setDaemon(True)
                         t.start()
