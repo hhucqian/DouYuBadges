@@ -29,10 +29,9 @@ class SpiderDispatcher:
 
     def print_record_count(self):
         while True:
-            time.sleep(10)
-            print('database record count:', self.badge_server.get_record_count())
-            print('current room count:', len(self.job_list))
-            print('room list:', ' '.join([job.nickname for job in self.job_list]))
+            time.sleep(20)
+            print('database record count:', self.badge_server.get_record_count(),
+                  'current room count:', len(self.job_list))
 
     def start(self):
         t = threading.Thread(target=self.print_record_count)
@@ -79,3 +78,6 @@ class SpiderDispatcher:
                         t.setDaemon(True)
                         t.start()
                         self.job_list.append(dy_room)
+
+            print('room list:', ' '.join(
+                [job.nickname for job in self.job_list]))
