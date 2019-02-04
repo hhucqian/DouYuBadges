@@ -81,3 +81,5 @@ class SpiderDispatcher:
 
             print('room list:', ' '.join(
                 [job.nickname for job in self.job_list]))
+            for job in self.job_list:
+                job.record_stamp = 0
