@@ -13,9 +13,8 @@ class SpiderDispatcher:
     def __init__(self):
         self.job_list = []
         self.badge_server = BadgeServer()
-        self.room_id_filter = {}
 
-    def load_room_id_list(self):
+    def load_room_info_list(self):
         with urllib.request.urlopen('http://open.douyucdn.cn/api/RoomApi/live?limit=100') as f:
             content = f.read().decode('utf-8')
             content = json.loads(content)
@@ -37,10 +36,10 @@ class SpiderDispatcher:
         t = threading.Thread(target=self.print_record_count)
         t.setDaemon(True)
         t.start()
-        room_id_list = self.load_room_id_list()
-        if room_id_list is not None:
-            for room_id in room_id_list:
-                dy_room = DouyuRoom(room_id[0], room_id[1], self.badge_server)
+        room_info_list = self.load_room_info_list()
+        if room_info_list is not None:
+            for room_info in room_info_list:
+                dy_room = DouyuRoom(room_info[0], room_info[1], self.badge_server)
                 t = threading.Thread(target=dy_room.start_job)
                 t.setDaemon(True)
                 t.start()
@@ -51,35 +50,24 @@ class SpiderDispatcher:
             stamp_level = 0
             jobs_to_stop = [
                 job for job in self.job_list if job.record_stamp <= stamp_level or job.is_stop]
-            jobs_to_continue = [
-                job for job in self.job_list if job.record_stamp > stamp_level]
-            running_room_id_list = [
-                job.room_id for job in self.job_list if job.record_stamp > stamp_level]
-            self.job_list = jobs_to_continue
-
-            for room_id in self.room_id_filter.keys():
-                self.room_id_filter[room_id] -= 1
-            self.room_id_filter = {
-                k: v for (k, v) in self.room_id_filter.items() if v > 0}
+            room_info_list = self.load_room_info_list()
+            room_id_to_run_list = [item[0] for item in room_info_list]
 
             for job in jobs_to_stop:
-                job.stop_job()
-                self.room_id_filter[job.room_id] = 10
+                if job.room_id not in room_id_to_run_list:
+                    job.stop_job()
+                    self.job_list.remove(job)
 
-            room_id_list = self.load_room_id_list()
-            for room_id in room_id_list:
-                if room_id[0] not in running_room_id_list:
-                    if room_id[0] in self.room_id_filter.keys():
-                        self.room_id_filter[room_id[0]] -= 1
-                    else:
-                        dy_room = DouyuRoom(
-                            room_id[0], room_id[1], self.badge_server)
-                        t = threading.Thread(target=dy_room.start_job)
-                        t.setDaemon(True)
-                        t.start()
-                        self.job_list.append(dy_room)
+            running_room_id_list = [item.room_id for item in self.job_list]
 
-            print('room list:', ' '.join(
-                [job.nickname for job in self.job_list]))
+            for room_info in room_info_list:
+                if room_info[0] not in running_room_id_list:
+                    dy_room = DouyuRoom(
+                        room_info[0], room_info[1], self.badge_server)
+                    t = threading.Thread(target=dy_room.start_job)
+                    t.setDaemon(True)
+                    t.start()
+                    self.job_list.append(dy_room)
+
             for job in self.job_list:
                 job.record_stamp = 0

@@ -111,4 +111,4 @@ class DouyuRoom:
         self.is_stop = True
 
     def __str__(self):
-        return "DanmuRoom[id={0}]".format(self.room_id)
+        return "DanmuRoom[id={0},nickname={1}]".format(self.room_id, self.nickname)
