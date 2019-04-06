@@ -2,8 +2,16 @@
 
 import sqlite3
 
+def clear_multi(conn : sqlite3.Connection):
+    c = conn.execute("select room_id from badges group by room_id HAVING count(room_id) > 1")
+    for item in c.fetchall():
+        item1 = conn.execute("select max(rowid) from badges where room_id = ?", item).fetchone()
+        conn.execute("delete from badges where room_id = ? and rowid < ?", (item[0], item1[0]))
+    conn.commit()
+
 def main():
     conn = sqlite3.connect("data.db")
+    clear_multi(conn)
     c = conn.execute("select name , room_id from badges order by name")
     item_line = []
     records = c.fetchall()
