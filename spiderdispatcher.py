@@ -15,7 +15,9 @@ class SpiderDispatcher:
         self.badge_server = BadgeServer()
 
     def load_room_info_list(self):
-        with urllib.request.urlopen('http://open.douyucdn.cn/api/RoomApi/live?limit=100') as f:
+        req = urllib.request.Request('http://open.douyucdn.cn/api/RoomApi/live?limit=100')
+        req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362")
+        with urllib.request.urlopen(req) as f:
             content = f.read().decode('utf-8')
             content = json.loads(content)
             if content['error'] != 0:
